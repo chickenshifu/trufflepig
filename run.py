@@ -21,16 +21,16 @@ try:
     
     print("Starting offline jobs...")
     
+    resultTuple = calculator.calculateStats()
     #calculator.calculateMeanAndDeviation()
     #resultTuple = calculator.calculateOutliers()
-    #
-    #print("Offline jobs done!")
-    #
-    #print("Sending mail...")
-    #recipient = variables.mailhandler_recipient
-    #mailHandler.sendMail(recipient, "Success", resultTuple)
-    #print("Mail successfully sent!")
-    #
+    
+    print("Offline jobs done!")
+    
+    print("Sending mail...")
+    mailHandler.sendMail("Success", resultTuple)
+    print("Mail successfully sent!")
+    
     
     print("Jobs finished!")
     

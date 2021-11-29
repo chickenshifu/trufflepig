@@ -23,10 +23,11 @@ def listToString(s):
     return str1
 
 
-def sendMail(recipient="", subject="", resultTuple=()):
+def sendMail(subject="", resultTuple=()):
 
     username = variables.mailhandler_usr 
     password = variables.mailhandler_pwd 
+    recipient = variables.mailhandler_recipient
 
     fromAddress = username
     toAddress  = recipient 
@@ -67,10 +68,9 @@ def sendMail(recipient="", subject="", resultTuple=()):
 if __name__ == '__main__':
 
     testString = "Hallo"
-    recipient = 'khlrtbs@gmail.com'
     subject = "TEST__MAIN__"
 
     testTuple = (["L", "T"], ["X", "Y"])
 
 
-    sendMail(recipient, subject, testTuple)
+    sendMail(subject, testTuple)

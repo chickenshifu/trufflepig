@@ -209,6 +209,7 @@ def writeDeviationToStatsTable(datatable_name, deviation):
         
         cursor.execute(sqlstatement, (deviation,))
 
+        db.commit()
         return cursor.lastrowid
 
     except Exception as e:
@@ -217,7 +218,6 @@ def writeDeviationToStatsTable(datatable_name, deviation):
 
          return -1
 
-    db.commit()
     db.close()
 
 
@@ -254,7 +254,7 @@ def writeMeanDeviationToStatsTable(datatable_name, mean, last_row_id):
 
         sqlstatement = '''UPDATE ''' + tbl_name + ''' SET (mean) = (?) WHERE (id) = (?);'''
         
-        cursor.execute(sqlstatement, (mean, last_row_id))
+        cursor.execute(sqlstatement, (mean, last_row_id,))
 
     except Exception as e:
 
@@ -265,7 +265,7 @@ def writeMeanDeviationToStatsTable(datatable_name, mean, last_row_id):
 
 
 
-def writeCorrelationToStatsTable(datatable_name, correlation):
+def writeCorrelationToStatsTable(datatable_name, correlation, last_row_id):
     
     datenbankname = "database/stats_trufflepig.db"
 
@@ -276,9 +276,9 @@ def writeCorrelationToStatsTable(datatable_name, correlation):
 
     try:
 
-        sqlstatement = '''INSERT OR IGNORE INTO ''' + tbl_name + ''' (correlation) VALUES (?);'''
+        sqlstatement = '''UPDATE ''' + tbl_name + ''' SET (correlation) = (?) WHERE (id) = (?);'''
         
-        cursor.execute(sqlstatement, (correlation,))
+        cursor.execute(sqlstatement, (correlation, last_row_id,))
 
     except Exception as e:
 

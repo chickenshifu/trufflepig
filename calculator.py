@@ -3,14 +3,14 @@
 import pandas as pd
 import databaseHandling
 
-
-def calculateDeviation():
-   '''Calculates deviation between watchlist entries'''
+def calculateStats():
 
    urls = databaseHandling.readUrls()
    a = len(urls)
    
    for i in range(0,a-1):
+
+       #1. CALCULATING DEVIATION
        name_for_database = f'[{urls.loc[i,"url"]}]'
        print(f'Calculating for {name_for_database}')
        data = databaseHandling.readStatsFromCryptoTable(name_for_database)
@@ -21,49 +21,88 @@ def calculateDeviation():
            databaseHandling.createStatsTable(name_for_database)
            d = data['watchlist'] - data['watchlist'].shift(1)
            d_last = d.iloc[-1]
-           print(f"Deviation: {d_last}")
 
            last_row_id = databaseHandling.writeDeviationToStatsTable(name_for_database, d_last)
-           print(f'Last row id (initially from calculateDeviation()): {last_row_id}')
-           return last_row_id
-   
+           print(f'Deviation={d_last} written into {name_for_database}. Last row id: {last_row_id}')
+
+
+           #2. CALCULATING MEAN DEIVATION
+           data = databaseHandling.readStatsFromStatsTable(name_for_database)
+           m = data['deviation'].mean()
+           databaseHandling.writeMeanDeviationToStatsTable(name_for_database, m, last_row_id)
+           print(f'{name_for_database} updated in last row id={last_row_id} with mean deviation={m}')
+
+           #3. CALCULATING CORRELATION
+           data = databaseHandling.readStatsFromCryptoTable(name_for_database)
+           c = data['watchlist'].corr(data['price'])
+           databaseHandling.writeCorrelationToStatsTable(name_for_database, c, last_row_id)
+           print(f'{name_for_database} updated in last row id={last_row_id} with correlation={c}')
+
        else:
-           print(f'New coin detected, table: {name_for_database}. Default values stay unchanged, since only one entry is available.')
- 
+          print(f'New coin detected, table: {name_for_database}. Default values stay unchanged, since only one entry is available.')
 
-def calculateMeanDeviation(last_row_id):
-   '''Calculates mean of deviation of watchlist entries'''
 
-   urls = databaseHandling.readUrls()
-   a = len(urls)
-   
-   for i in range(0,a-1):
-       name_for_database = f'[{urls.loc[i,"url"]}]'
-       print(f'Calculating for {name_for_database}')
-       data = databaseHandling.readStatsFromStatsTable(name_for_database)
-   
-       m = data['deviation'].mean()
-       print(f"Mean (deviation): {m}")
 
-       databaseHandling.writeMeanDeviationToStatsTable(name_for_database, m, last_row_id)
-   
-
-def calculateCorrelation():
-   '''Calculates correlation between deviation and price'''
-
-   urls = databaseHandling.readUrls()
-   a = len(urls)
-   
-   for i in range(0,a-1):
-       name_for_database = f'[{urls.loc[i,"url"]}]'
-       print(f'Calculating for {name_for_database}')
-       data = databaseHandling.readStatsFromCryptoTable(name_for_database)
-   
-       c = data['watchlist'].corr(data['price'])
-       print(f"Correlation (watchlist deviation vs. price): {c}")
-
-       databaseHandling.writeCorrelationToStatsTable(name_for_database, c)
-
+# def calculateDeviation():
+#    '''Calculates deviation between watchlist entries'''
+# 
+#    urls = databaseHandling.readUrls()
+#    a = len(urls)
+#    
+#    for i in range(0,a-1):
+#        name_for_database = f'[{urls.loc[i,"url"]}]'
+#        print(f'Calculating for {name_for_database}')
+#        data = databaseHandling.readStatsFromCryptoTable(name_for_database)
+#        length = len(data)
+#    
+#        #Only dataframes with more than one entry
+#        if length > 1:
+#            databaseHandling.createStatsTable(name_for_database)
+#            d = data['watchlist'] - data['watchlist'].shift(1)
+#            d_last = d.iloc[-1]
+#            print(f"Deviation: {d_last}")
+# 
+#            last_row_id = databaseHandling.writeDeviationToStatsTable(name_for_database, d_last)
+#            print(f'Last row id (initially from calculateDeviation()): {last_row_id}')
+#            return last_row_id
+#    
+#        else:
+#           print(f'New coin detected, table: {name_for_database}. Default values stay unchanged, since only one entry is available.')
+#  
+# 
+# def calculateMeanDeviation(last_row_id):
+#    '''Calculates mean of deviation of watchlist entries'''
+# 
+#    urls = databaseHandling.readUrls()
+#    a = len(urls)
+#    
+#    for i in range(0,a-1):
+#        name_for_database = f'[{urls.loc[i,"url"]}]'
+#        print(f'Calculating for {name_for_database}')
+#        data = databaseHandling.readStatsFromStatsTable(name_for_database)
+#    
+#        m = data['deviation'].mean()
+#        print(f"Mean (deviation): {m}")
+# 
+#        databaseHandling.writeMeanDeviationToStatsTable(name_for_database, m, last_row_id)
+#    
+# 
+# def calculateCorrelation():
+#    '''Calculates correlation between deviation and price'''
+# 
+#    urls = databaseHandling.readUrls()
+#    a = len(urls)
+#    
+#    for i in range(0,a-1):
+#        name_for_database = f'[{urls.loc[i,"url"]}]'
+#        print(f'Calculating for {name_for_database}')
+#        data = databaseHandling.readStatsFromCryptoTable(name_for_database)
+#    
+#        c = data['watchlist'].corr(data['price'])
+#        print(f"Correlation (watchlist deviation vs. price): {c}")
+# 
+#        databaseHandling.writeCorrelationToStatsTable(name_for_database, c)
+# 
 
 def calculateOutliers(): 
    '''Calculate outliers'''
@@ -117,18 +156,22 @@ def calculateOutliers():
 
 if __name__ == '__main__':
 
-     print(f'Testing {calculateDeviation} autonomously...')
-     last_row_id = calculateDeviation()
-     print('Finished testing')
 
-     print(f'Testing {calculateMeanDeviation} autonomously...')
-     calculateMeanDeviation(last_row_id)
-     print('Finished testing')
-
-     print(f'Testing {calculateCorrelation} autonomously...')
-     calculateCorrelation()
-     print('Finished testing')
-
+     print('Testing {calculateStats()} autonomously...')
+     calculateStats()
+     print('Finished testing!')
+#      print(f'Testing {calculateDeviation} autonomously...')
+#      last_row_id = calculateDeviation()
+#      print('Finished testing')
+# 
+#      print(f'Testing {calculateMeanDeviation} autonomously...')
+#      calculateMeanDeviation(last_row_id)
+#      print('Finished testing')
+# 
+#      print(f'Testing {calculateCorrelation} autonomously...')
+#      calculateCorrelation()
+#      print('Finished testing')
+# 
      print(f'Testing {calculateOutliers}')
      results = calculateOutliers()
 
