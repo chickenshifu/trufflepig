@@ -7,11 +7,12 @@ import databaseHandling
 import calculator
 import mailHandler
 import variables
+import time
 
 try:
 
+    start = time.time()
     print("Starting online job...")
-
 
     '''Refresh database with raw data, this job lasts for at least 4-5 hours and shall run once per day'''
     parser.parseCryptoUrls()
@@ -22,16 +23,15 @@ try:
     print("Starting offline jobs...")
     
     resultTuple = calculator.calculateStats()
-    #calculator.calculateMeanAndDeviation()
-    #resultTuple = calculator.calculateOutliers()
     
     print("Offline jobs done!")
     
     print("Sending mail...")
     mailHandler.sendMail("Success", resultTuple)
     print("Mail successfully sent!")
-    print("Jobs finished!")
-    
+    end = time.time()
+    elapsed_time = end-start
+    print(f'Jobs finished! (Total time elapsed: {elapsed_time}')
     
 except Exception as e:
 

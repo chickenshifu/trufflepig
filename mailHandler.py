@@ -25,9 +25,9 @@ def listToString(s):
 
 def sendMail(subject="", resultTuple=()):
 
-    username = os.getenv('MAILHANDLER_USR')
-    password = os.getenv('MAILHANDLER_PWD')
-    recipient = os.getenv('MAILHANDLER_RECIPIENT')
+    username = os.environ['MAILHANDLER_USR']
+    password = os.environ['MAILHANDLER_PWD']
+    recipient = os.environ['MAILHANDLER_RECIPIENT']
     
     print(f'Sending mail address: {username}')
     print(f'Receiving mail address: {recipient}')
