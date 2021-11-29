@@ -143,7 +143,7 @@ def parseData():
 
           ######WRITE CRYPTO VALUES TO DATABASE AS NEW TABLE######
           databaseHandling.writeStatsToCryptoTable(name_for_database, watchlist_entry, current_price)
-          print(f'Progess: {round(i/a*100,2)} %, Estimated time left: {round((a-i)*1.5/60/60, 2)} h (mean), {round((a-i)*3/60/60, 2)} h (max.) ' )
+          print(f'Progess: {round(i/a*100,2)} %)' )
          
       
       driver.close()

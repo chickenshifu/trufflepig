@@ -30,8 +30,6 @@ try:
     print("Sending mail...")
     mailHandler.sendMail("Success", resultTuple)
     print("Mail successfully sent!")
-    
-    
     print("Jobs finished!")
     
     

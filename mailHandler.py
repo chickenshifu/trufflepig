@@ -5,7 +5,7 @@ from email import message
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-import variables
+import os
 
 def intersperse(lst, item):
     result = [item] * (len(lst) * 2 - 1)
@@ -25,12 +25,15 @@ def listToString(s):
 
 def sendMail(subject="", resultTuple=()):
 
-    username = variables.mailhandler_usr 
-    password = variables.mailhandler_pwd 
-    recipient = variables.mailhandler_recipient
+    username = os.getenv('MAILHANDLER_USR')
+    password = os.getenv('MAILHANDLER_PWD')
+    recipient = os.getenv('MAILHANDLER_RECIPIENT')
+    
+    print(f'Sending mail address: {username}')
+    print(f'Receiving mail address: {recipient}')
 
     fromAddress = username
-    toAddress  = recipient 
+    toAddress = recipient 
     msg = MIMEMultipart()
     msg['From'] = fromAddress
     msg['To'] = toAddress
