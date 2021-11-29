@@ -20,16 +20,15 @@ def calculateMeanAndDeviation():
    
        #Only dataframes with more than one entry
        if length > 1:
-           data['deviation'] = data['watchlist'] - data['watchlist'].shift(1)
-           devi = data['deviation'].iloc[-1] 
+           d = data['watchlist'] - data['watchlist'].shift(1)
+           print(f"Watchlist: {data['watchlist']} / WatchList_before: {data['watchlist'].shift(1)} = {d}")
+           #data['deviation'].iloc[-1] = d 
    
-           meani = data.deviation.mean()
-           data['mean'].iloc[-1] = meani 
+           #m = data.deviation.mean()
+           #print(f'Mean deviation: {m}')
+           #data['mean'].iloc[-1] = m 
 
-           watchi = data['watchlist'].iloc[-1]
-   
-           #databaseHandling.cleanZeros(name_for_database)
-           databaseHandling.writeStatsToCryptoTable(name_for_database, watchi, devi, meani)
+           #databaseHandling.writeStatsToCryptoTable(name_for_database, watchi, devi, meani)
            
    
        else:
@@ -94,13 +93,13 @@ if __name__ == '__main__':
     print(f'Finished testing')
 
 
-    print(f'Testing {calculateOutliers}')
-    results = calculateOutliers()
-
-    import mailHandler
-
-    recipient = 'khlrtbs@gmail.com'
-    subject = "TEST"
-    mailHandler.sendMail(recipient,subject, results)
+#    print(f'Testing {calculateOutliers}')
+#    results = calculateOutliers()
+#
+#    import mailHandler
+#
+#    recipient = 'khlrtbs@gmail.com'
+#    subject = "TEST"
+#    mailHandler.sendMail(recipient,subject, results)
 
     print("Finished testing")
