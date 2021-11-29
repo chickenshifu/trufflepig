@@ -48,6 +48,7 @@ def createSingleCryptoTable(tablename):
     try:
 
         tableCreation = '''CREATE TABLE IF NOT EXISTS ''' + tbl_name + ''' (
+                                    id INTEGER PRIMARY KEY AUTOINCREMENT,
                                     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
                                     watchlist REAL,
                                     price REAL);'''
