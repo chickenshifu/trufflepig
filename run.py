@@ -15,22 +15,22 @@ try:
 
     '''Refresh database with raw data, this job lasts for at least 4-5 hours and shall run once per day'''
     parser.parseCryptoUrls()
-    parser.parseWatchlistEntry()
+    parser.parseData()
     
     print("Online job done!")
     
     print("Starting offline jobs...")
     
-    calculator.calculateMeanAndDeviation()
-    resultTuple = calculator.calculateOutliers()
-    
-    print("Offline jobs done!")
-    
-    print("Sending mail...")
-    recipient = variables.mailhandler_recipient
-    mailHandler.sendMail(recipient, "Success", resultTuple)
-    print("Mail successfully sent!")
-    
+    #calculator.calculateMeanAndDeviation()
+    #resultTuple = calculator.calculateOutliers()
+    #
+    #print("Offline jobs done!")
+    #
+    #print("Sending mail...")
+    #recipient = variables.mailhandler_recipient
+    #mailHandler.sendMail(recipient, "Success", resultTuple)
+    #print("Mail successfully sent!")
+    #
     
     print("Jobs finished!")
     

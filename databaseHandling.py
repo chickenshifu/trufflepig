@@ -53,8 +53,7 @@ def createSingleCryptoTable(tablename):
         tableCreation = '''CREATE TABLE IF NOT EXISTS ''' + tbl_name + ''' (
                                     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
                                     watchlist REAL,
-                                    deviation REAL,
-                                    mean REAL);'''
+                                    price REAL);'''
 
         cursor.execute(tableCreation)
 
@@ -96,7 +95,8 @@ def appendTableWithUrls(crypto_url, suffix=None):
     db.commit()
     db.close()
 
-def appendCryptoTableWithWatchlist(tablename, watchlist, d, m, suffix=None):
+
+def appendCryptoTableWithWatchlist(tablename, watchlist, current_price, suffix=None):
     datenbankname = 'database/trufflepig.db'
 
     tbl_name = tablename
@@ -105,10 +105,10 @@ def appendCryptoTableWithWatchlist(tablename, watchlist, d, m, suffix=None):
     cursor = db.cursor()
 
     try:
+    
+         sqlstatement = ''' INSERT OR IGNORE INTO ''' + tbl_name + ''' (watchlist, price) VALUES (?, ?);'''
      
-         sqlstatement = ''' INSERT OR IGNORE INTO ''' + tbl_name + ''' (watchlist, deviation, mean) VALUES (?, ?, ?);'''
-     
-         cursor.execute(sqlstatement, (watchlist, d, m))
+         cursor.execute(sqlstatement, (watchlist, current_price))
      
          #print(f'Eintrag für {tablename} zur Datenbank hinzugefügt bzw. ignoriert, da bereits vorhanden.')
      
@@ -118,6 +118,7 @@ def appendCryptoTableWithWatchlist(tablename, watchlist, d, m, suffix=None):
 
     db.commit()
     db.close()
+
 
 def readUrls():
 
@@ -140,7 +141,7 @@ def readUrls():
     return df
 
 
-def writeStatsToCryptoTable(datatable_name, watchlist, d, m):
+def writeStatsToCryptoTable(datatable_name, watchlist, current_price):
     
     datenbankname = "database/trufflepig.db"
 
@@ -151,9 +152,9 @@ def writeStatsToCryptoTable(datatable_name, watchlist, d, m):
 
     try:
 
-        sqlstatement = '''INSERT OR IGNORE INTO ''' + tbl_name + ''' (watchlist, deviation, mean) VALUES (?, ?, ?);'''
+        sqlstatement = '''INSERT OR IGNORE INTO ''' + tbl_name + ''' (watchlist, price) VALUES (?, ?);'''
         
-        cursor.execute(sqlstatement, (watchlist, d, m))
+        cursor.execute(sqlstatement, (watchlist, current_price))
 
     except Exception as e:
 
@@ -172,7 +173,7 @@ def readStatsFromCryptoTable(datatable_name):
     db = sqlite3.connect(datenbankname)
 
     try:
-        df = pd.read_sql_query("SELECT watchlist, deviation, mean FROM " + tbl_name, db)
+        df = pd.read_sql_query("SELECT watchlist, current_price FROM " + tbl_name, db)
 
     except Exception as e:
 
@@ -183,25 +184,4 @@ def readStatsFromCryptoTable(datatable_name):
     return df
 
 
-
-def cleanZeros(datatable_name):
-
-    datenbankname = 'database/trufflepig.db'
-
-    tbl_name = datatable_name
-
-    db = sqlite3.connect(datenbankname)
-    cursor = db.cursor()
-
-    try:
-        sqlstatement = '''DELETE FROM ''' + tbl_name + ''' WHERE deviation = 0''' 
-
-        cursor.execute(sqlstatement)
-
-    except Exception as e:
-
-        print('Failed: ' + str(e))
-
-    db.commit()
-    db.close()
 

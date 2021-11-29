@@ -115,7 +115,7 @@ def parseCryptoUrls():
         if req.status_code != 200 or i>1:
             print(f"Stopped parsing from {url}. Last page parsed: {i}.")
      
-def parseWatchlistEntry():
+def parseData():
       ########OPEN EACH URL AND SCAN 'WATCHLIST' ENTRY####
       print("Lese aus DB...")
       urls = databaseHandling.readUrls()
@@ -135,32 +135,16 @@ def parseWatchlistEntry():
           time.sleep(1+random.randrange(0,2))
           soup = BeautifulSoup(html_source, 'html.parser')
           watchlist_entry = soup.select('div.namePill:nth-child(3)')
-      
-          ####FORMAT NUMBER TO INT####
+          current_price = soup.select('.priceValue > span:nth-child(1)')[0].get_text()
+
+          ####FORMAT NUMBERS####
           watchlist_entry = re.sub('[^0-9,]', "", str(watchlist_entry)).replace(",", "")
-          #Dummy values for deviation and mean
-          data = databaseHandling.readStatsFromCryptoTable(name_for_database)
-          length = len(data)
+          current_price = float(current_price.replace("$","").replace(",",""))
 
-          if length < 1:
-
-              d = 0
-              m = 0
-              ######WRITE (NEW CRYPTO URLS) TO DATABASE AS NEW TABLE######
-              databaseHandling.appendCryptoTableWithWatchlist(name_for_database, watchlist_entry, d, m)
-              print(f'Progess: {round(i/a*100,2)} %, Estimated time left: {round((a-i)*1.5/60/60, 2)} h (mean), {round((a-i)*3/60/60, 2)} h (max.) ' )
-          
-          else:
-           
-              d = data['deviation'].iloc[-1]
-              print(f'Last entry for deviation: {d}')
-              m = data['mean'].iloc[-1]
-              print(f'Last entry for mean (deviation): {m}')
-      
-              ######WRITE (NEW CRYPTO URLS) TO DATABASE AS NEW TABLE######
-              databaseHandling.appendCryptoTableWithWatchlist(name_for_database, watchlist_entry, d, m)
-              print(f'Progess: {round(i/a*100,2)} %, Estimated time left: {round((a-i)*1.5/60/60, 2)} h (mean), {round((a-i)*3/60/60, 2)} h (max.) ' )
-          
+          ######WRITE CRYPTO VALUES TO DATABASE AS NEW TABLE######
+          databaseHandling.writeStatsToCryptoTable(name_for_database, watchlist_entry, current_price)
+          print(f'Progess: {round(i/a*100,2)} %, Estimated time left: {round((a-i)*1.5/60/60, 2)} h (mean), {round((a-i)*3/60/60, 2)} h (max.) ' )
+         
       
       driver.close()
       
