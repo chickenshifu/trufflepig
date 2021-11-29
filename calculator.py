@@ -7,7 +7,7 @@ import databaseHandling
 
 
 def calculateMeanAndDeviation():
-   '''Read in every Crypto as Pandas dataframe, calculate deviation and mean save it back to database.
+   '''Read in every Crypto as Pandas dataframe, calculate deviation, mean and correlation and saves it back to database.
    This job is separated from the one above, to make the calculation run offline with raw data from job above and to allow for parallel threading in a later stage.'''
    
    urls = databaseHandling.readUrls()
