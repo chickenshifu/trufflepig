@@ -1,8 +1,5 @@
 #!/usr/bin/python3
 
-###     zentrales Modul zum Austausch der Daten aus der SQLite Datenbank
-
-
 import sqlite3
 import pandas as pd
 from datetime import datetime
@@ -175,10 +172,11 @@ def createStatsTable(tablename):
     try:
 
         tableCreation = '''CREATE TABLE IF NOT EXISTS ''' + tbl_name + ''' (
+                                    id INTEGER PRIMARY KEY AUTOINCREMENT,
                                     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
                                     deviation REAL,
                                     mean REAL,
-                                    correlation REAL);'''
+                                    correlation INTEGER);'''
 
         cursor.execute(tableCreation)
 
@@ -196,9 +194,9 @@ def createStatsTable(tablename):
 
         return 0
 
-def writeStatsToStatsTable(datatable_name, deviation, mean, correlation):
+def writeDeviationToStatsTable(datatable_name, deviation):
     
-    datenbankname = "database/trufflepig.db"
+    datenbankname = "database/stats_trufflepig.db"
 
     tbl_name = datatable_name
 
@@ -207,9 +205,56 @@ def writeStatsToStatsTable(datatable_name, deviation, mean, correlation):
 
     try:
 
-        sqlstatement = '''INSERT OR IGNORE INTO ''' + tbl_name + ''' (deviation, mean, correlation) VALUES (?, ?);'''
+        sqlstatement = '''INSERT OR IGNORE INTO ''' + tbl_name + ''' (deviation) VALUES (?);'''
         
-        cursor.execute(sqlstatement, (deviation, mean, correlation))
+        cursor.execute(sqlstatement, (deviation,))
+
+        return cursor.lastrowid
+
+    except Exception as e:
+
+         print(f'{e}, Eintrag für {tbl_name} konnte nicht hinzugefügt werden.')
+
+         return -1
+
+    db.commit()
+    db.close()
+
+
+def readStatsFromStatsTable(datatable_name):
+
+    datenbankname = 'database/stats_trufflepig.db'
+
+    tbl_name = datatable_name
+
+    db = sqlite3.connect(datenbankname)
+
+    try:
+        df = pd.read_sql_query("SELECT deviation, mean, correlation FROM " + tbl_name, db)
+
+    except Exception as e:
+
+        print('Failed: ' + str(e))
+
+    db.close()
+
+    return df
+
+
+def writeMeanDeviationToStatsTable(datatable_name, mean, last_row_id):
+    
+    datenbankname = "database/stats_trufflepig.db"
+
+    tbl_name = datatable_name
+
+    db = sqlite3.connect(datenbankname)
+    cursor = db.cursor()
+
+    try:
+
+        sqlstatement = '''UPDATE ''' + tbl_name + ''' SET (mean) = (?) WHERE (id) = (?);'''
+        
+        cursor.execute(sqlstatement, (mean, last_row_id))
 
     except Exception as e:
 
@@ -220,5 +265,24 @@ def writeStatsToStatsTable(datatable_name, deviation, mean, correlation):
 
 
 
+def writeCorrelationToStatsTable(datatable_name, correlation):
+    
+    datenbankname = "database/stats_trufflepig.db"
 
+    tbl_name = datatable_name
 
+    db = sqlite3.connect(datenbankname)
+    cursor = db.cursor()
+
+    try:
+
+        sqlstatement = '''INSERT OR IGNORE INTO ''' + tbl_name + ''' (correlation) VALUES (?);'''
+        
+        cursor.execute(sqlstatement, (correlation,))
+
+    except Exception as e:
+
+         print(f'{e}, Eintrag für {tbl_name} konnte nicht hinzugefügt werden.')
+
+    db.commit()
+    db.close()

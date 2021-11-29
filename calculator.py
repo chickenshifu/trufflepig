@@ -1,40 +1,68 @@
 #!/usr/bin/python3
 
-'''CALCULATES THE THRESHOLD AND RETURNS POSSIBLE OUTLIERS'''
-
 import pandas as pd
 import databaseHandling
 
 
-def calculateMeanAndDeviation():
-   '''Read in every Crypto as Pandas dataframe, calculate deviation, mean and correlation and saves it back to database.
-   This job is separated from the one above, to make the calculation run offline with raw data from job above and to allow for parallel threading in a later stage.'''
-   
+def calculateDeviation():
+   '''Calculates deviation between watchlist entries'''
+
    urls = databaseHandling.readUrls()
    a = len(urls)
    
    for i in range(0,a-1):
        name_for_database = f'[{urls.loc[i,"url"]}]'
+       print(f'Calculating for {name_for_database}')
        data = databaseHandling.readStatsFromCryptoTable(name_for_database)
        length = len(data)
    
        #Only dataframes with more than one entry
        if length > 1:
+           databaseHandling.createStatsTable(name_for_database)
            d = data['watchlist'] - data['watchlist'].shift(1)
-           print(f"Watchlist: {data['watchlist']} / WatchList_before: {data['watchlist'].shift(1)} = {d}")
-           #data['deviation'].iloc[-1] = d 
-   
-           #m = data.deviation.mean()
-           #print(f'Mean deviation: {m}')
-           #data['mean'].iloc[-1] = m 
+           d_last = d.iloc[-1]
+           print(f"Deviation: {d_last}")
 
-           #databaseHandling.writeStatsToCryptoTable(name_for_database, watchi, devi, meani)
-           
+           last_row_id = databaseHandling.writeDeviationToStatsTable(name_for_database, d_last)
+           print(f'Last row id (initially from calculateDeviation()): {last_row_id}')
+           return last_row_id
    
        else:
            print(f'New coin detected, table: {name_for_database}. Default values stay unchanged, since only one entry is available.')
-  
+ 
 
+def calculateMeanDeviation(last_row_id):
+   '''Calculates mean of deviation of watchlist entries'''
+
+   urls = databaseHandling.readUrls()
+   a = len(urls)
+   
+   for i in range(0,a-1):
+       name_for_database = f'[{urls.loc[i,"url"]}]'
+       print(f'Calculating for {name_for_database}')
+       data = databaseHandling.readStatsFromStatsTable(name_for_database)
+   
+       m = data['deviation'].mean()
+       print(f"Mean (deviation): {m}")
+
+       databaseHandling.writeMeanDeviationToStatsTable(name_for_database, m, last_row_id)
+   
+
+def calculateCorrelation():
+   '''Calculates correlation between deviation and price'''
+
+   urls = databaseHandling.readUrls()
+   a = len(urls)
+   
+   for i in range(0,a-1):
+       name_for_database = f'[{urls.loc[i,"url"]}]'
+       print(f'Calculating for {name_for_database}')
+       data = databaseHandling.readStatsFromCryptoTable(name_for_database)
+   
+       c = data['watchlist'].corr(data['price'])
+       print(f"Correlation (watchlist deviation vs. price): {c}")
+
+       databaseHandling.writeCorrelationToStatsTable(name_for_database, c)
 
 
 def calculateOutliers(): 
@@ -43,8 +71,8 @@ def calculateOutliers():
    resultList = []
    trashList = []
 
-   lower_dev = 0 #0 percentage deviation, meaning, that a deviation greater than the mean is enough
-   higher_dev = 0.10 #10 percentage deviation
+   lower_dev = 0.10 #10 percentage deviation, meaning, that a deviation greater than the mean is enough
+   higher_dev = 0.25 #25 percentage deviation
 
    urls = databaseHandling.readUrls()
    a = len(urls)
@@ -53,13 +81,14 @@ def calculateOutliers():
      name_for_database = f'[{urls.loc[i, "url"]}]'
      name_for_mail = name_for_database.split("/")[2]
      data = databaseHandling.readStatsFromCryptoTable(name_for_database)
+     data_stats = databaseHandling.readStatsFromStatsTable(name_for_database)
     
      length = len(data)
     
      if length > 1:
          last_watchlist = data['watchlist'].iloc[-1]
-         last_deviation = data['deviation'].iloc[-1]
-         last_mean = data['mean'].iloc[-1]
+         last_deviation = data_stats['deviation'].iloc[-1]
+         last_mean = data_stats['mean'].iloc[-1]
     
          lower_threshold = last_mean * (1+lower_dev)
          higher_threshold = last_mean * (1+higher_dev)
@@ -88,18 +117,24 @@ def calculateOutliers():
 
 if __name__ == '__main__':
 
-    print(f'Testing {calculateMeanAndDeviation} autonomously...')
-    calculateMeanAndDeviation()
-    print(f'Finished testing')
+     print(f'Testing {calculateDeviation} autonomously...')
+     last_row_id = calculateDeviation()
+     print('Finished testing')
 
+     print(f'Testing {calculateMeanDeviation} autonomously...')
+     calculateMeanDeviation(last_row_id)
+     print('Finished testing')
 
-#    print(f'Testing {calculateOutliers}')
-#    results = calculateOutliers()
-#
-#    import mailHandler
-#
-#    recipient = 'khlrtbs@gmail.com'
-#    subject = "TEST"
-#    mailHandler.sendMail(recipient,subject, results)
+     print(f'Testing {calculateCorrelation} autonomously...')
+     calculateCorrelation()
+     print('Finished testing')
 
-    print("Finished testing")
+     print(f'Testing {calculateOutliers}')
+     results = calculateOutliers()
+
+     import mailHandler
+
+     subject = "TEST"
+     mailHandler.sendMail(recipient,subject, results)
+
+     print("Finished testing")
