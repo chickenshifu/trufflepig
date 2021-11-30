@@ -22,17 +22,22 @@ try:
     
     print("Starting offline jobs...")
     
-    resultTuple = calculator.calculateStats()
+    calculator.calculateStats()
+    results = calculator.calculateOutliers()
     
     print("Offline jobs done!")
     
     print("Sending mail...")
-    mailHandler.sendMail("Success", resultTuple)
+    mailHandler.sendMail("Success", results)
     print("Mail successfully sent!")
     end = time.time()
-    elapsed_time = end-start
-    print(f'Jobs finished! (Total time elapsed: {elapsed_time}')
+    elapsed_time = (end-start)/60
+    print(f'Jobs finished! (Total time elapsed (mins): {elapsed_time}')
     
 except Exception as e:
 
     print(f'ERROR: {e}')
+    e = str(e)
+    e_tuple = ([e], [])
+    mailHandler.sendMail("ERROR", e_tuple)
+

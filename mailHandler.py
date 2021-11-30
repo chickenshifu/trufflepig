@@ -74,6 +74,7 @@ if __name__ == '__main__':
     subject = "TEST__MAIN__"
 
     testTuple = (["L", "T"], ["X", "Y"])
+    testTuple = ([], [])
 
 
     sendMail(subject, testTuple)

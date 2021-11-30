@@ -68,7 +68,7 @@ def parseCryptoUrls():
     req = requests.get(url)
     '''Loop breaks, if other than 200 HTTP response OR maximum pages parsed'''
     i = 1 
-    while not (i>1): #5 Pages == 500 cryptos
+    while not (i>4): #5 Pages == 500 cryptos
     
         print(f'Parsing page: {i}')
         url_full = url + url_suffix + str(i)
