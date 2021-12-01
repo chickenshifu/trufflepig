@@ -133,3 +133,4 @@ database/**
 trufflepig_cronjob.log
 geckodriver.log
 test*
+charts/**
