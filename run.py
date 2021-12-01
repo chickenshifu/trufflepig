@@ -8,6 +8,7 @@ import calculator
 import mailHandler
 import variables
 import time
+import traceback
 
 try:
 
@@ -38,6 +39,8 @@ except Exception as e:
 
     print(f'ERROR: {e}')
     e = str(e)
-    e_tuple = ([e], [])
+    full_traceback=str(traceback.format_exc())
+    print(full_traceback)
+    e_tuple = ([e], [full_traceback])
     mailHandler.sendMail("ERROR", e_tuple)
 

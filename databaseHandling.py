@@ -149,15 +149,19 @@ def readStatsFromCryptoTable(datatable_name):
     db = sqlite3.connect(datenbankname)
 
     try:
+
         df = pd.read_sql_query("SELECT watchlist, price FROM " + tbl_name, db)
+        db.close()
+
+        return df
 
     except Exception as e:
 
         print('Failed: ' + str(e))
 
-    db.close()
 
-    return df
+
+
 
 
 

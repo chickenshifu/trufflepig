@@ -14,6 +14,7 @@ def calculateStats():
        name_for_database = f'[{urls.loc[i,"url"]}]'
        print(f'Calculating for {name_for_database}')
        data = databaseHandling.readStatsFromCryptoTable(name_for_database)
+       print(data)
        length = len(data)
    
        #Only dataframes with more than one entry
@@ -100,20 +101,10 @@ if __name__ == '__main__':
      print('Testing {calculateStats()} autonomously...')
      calculateStats()
      print('Finished testing!')
-#      print(f'Testing {calculateDeviation} autonomously...')
-#      last_row_id = calculateDeviation()
-#      print('Finished testing')
-# 
-#      print(f'Testing {calculateMeanDeviation} autonomously...')
-#      calculateMeanDeviation(last_row_id)
-#      print('Finished testing')
-# 
-#      print(f'Testing {calculateCorrelation} autonomously...')
-#      calculateCorrelation()
-#      print('Finished testing')
-# 
+
      print(f'Testing {calculateOutliers}')
      results = calculateOutliers()
+     print("Finished testing!")
 
      import mailHandler
 

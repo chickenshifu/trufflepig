@@ -68,7 +68,7 @@ def parseCryptoUrls():
     req = requests.get(url)
     '''Loop breaks, if other than 200 HTTP response OR maximum pages parsed'''
     i = 1 
-    while not (i>4): #5 Pages == 500 cryptos
+    while not (i>1): #5 Pages == 500 cryptos
     
         print(f'Parsing page: {i}')
         url_full = url + url_suffix + str(i)
@@ -113,7 +113,7 @@ def parseCryptoUrls():
         req = requests.get(url_full)
 
         if req.status_code != 200 or i>1:
-            print(f"Stopped parsing from {url}. Last page parsed: {i}.")
+            print(f"Stopped parsing page {i-1}.")
      
 def parseData():
       ########OPEN EACH URL AND SCAN 'WATCHLIST' ENTRY####
@@ -127,7 +127,6 @@ def parseData():
           databaseHandling.createSingleCryptoTable(name_for_database)
       
           target_url = url + name_for_selenium
-          print(f'Open {target_url}')
           
           ######SELENIUM ACTION#####
           driver.get(target_url)
@@ -143,7 +142,8 @@ def parseData():
 
           ######WRITE CRYPTO VALUES TO DATABASE AS NEW TABLE######
           databaseHandling.writeStatsToCryptoTable(name_for_database, watchlist_entry, current_price)
-          print(f'Progess: {round(i/a*100,2)} %)' )
+          prog = round(i/(a-1)*100,2)
+          print(f'Parsed {target_url}. Watchlist Entry={watchlist_entry}, Current Price={current_price} USD // Progess: {prog} %)' )
          
       
       driver.close()
@@ -159,6 +159,6 @@ if __name__ == '__main__':
     parseCryptoUrls()
     
     print('Testing parseWatchlistEntry')
-    parseWatchlistEntry()
+    parseData()
 
     print(f'Finished testing {__name__}!')
