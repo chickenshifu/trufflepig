@@ -55,13 +55,19 @@ def simple_graph(name_for_database):
 
 if __name__ == '__main__':
 
-    print(f'Testing {simple_graph} autonomously...')
-    n = '[/currencies/ethereum/]'
-    simple_graph(n)
-    print('Finished testing')
+    #print(f'Testing {simple_graph} autonomously...')
+    #n = '[/currencies/ethereum/]'
+    #simple_graph(n)
+    #print('Finished testing')
     
 
+    #MASS TEST
+    print(f'Testing {simple_graph} autonomously...')
+    urls = databaseHandling.readUrls()
+    a = len(urls)
 
+    for i in range(0,a-1):
+        name_for_database = f'[{urls.loc[i, "url"]}]'
+        simple_graph(name_for_database)
 
-
-
+    print('Finished testing')
