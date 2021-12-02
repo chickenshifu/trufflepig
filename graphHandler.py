@@ -36,14 +36,14 @@ def simple_graph(name_for_database):
    # set x-axis label
    ax.set_xlabel("time",fontsize=10)
    # set y-axis label
-   ax.set_ylabel("price(usd)",color="red",fontsize=10)
-   ax.set_title(f'wtchlst(delta) vs. prc(usd) - {name_for_mail}')
+   ax.set_ylabel("prc($)",color="red",fontsize=10)
+   ax.set_title(f'\u2300 wtchlst(\u0394) vs. prc($) - {name_for_mail}')
 
    # twin object for two different y-axis on the sample plot
    ax2=ax.twinx()
    # make a plot with different y-axis using second axis object
    ax2.plot(mean_list,color="blue",marker="x", markersize=0.8, linewidth=0.5)
-   ax2.set_ylabel("mean deviation(watchlist)",color="blue", fontsize=10)
+   ax2.set_ylabel("\u2300 wtchlst(\u0394)",color="blue", fontsize=10)
    plt.show()
    # save the plot as a file
    fig.savefig(file_path,
